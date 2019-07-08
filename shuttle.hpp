@@ -30,7 +30,7 @@ public:
 
         // Fields
         float a, b, c, d, e, f, g, h, i;
-        int label;
+        int   label;
 
         std::vector< std::vector<float> > data;
         std::vector<int>                  labels;
@@ -52,8 +52,8 @@ public:
         std::shuffle(std::begin(labels), std::end(labels), engine);
 
         // Read values directly into raw float arrays
-        train_X.insert(train_X.begin(), data.begin(), data.begin() + num_training_samples);
-        train_y.insert(train_y.begin(), labels.begin(), labels.begin() + num_training_samples);
+        train_X.insert(train_X.begin(), data.begin(), data.end());
+        train_y.insert(train_y.begin(), labels.begin(), labels.end());
 
         data.clear();
         labels.clear();

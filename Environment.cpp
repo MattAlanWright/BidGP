@@ -42,7 +42,7 @@ ClassificationEnvironment::ClassificationEnvironment(
     p_size(p_size),
     p_gap(p_gap),
     tau(tau),
-    dataset(X, y, num_classes) {}
+    dataset(X, y) {}
 
 std::vector<Learner>
 ClassificationEnvironment::initializeLearners(int action) {
@@ -64,7 +64,7 @@ ClassificationEnvironment::generateLearners(std::vector<Learner> &learner_pop) {
     std::vector<Learner> new_learners;
     for( int i = 0; i < p_gap; i++ ) {
 
-        if( Random::get<float>(0.0, 1.0) < 0.5 ) {
+        if( Random::get<float>(0.0, 1.0) < 0.8 ) {
 
             // Copy member of current Learner pop into new_learner
             Learner new_learner = *Random::get(learner_pop);
@@ -115,6 +115,43 @@ ClassificationEnvironment::standardFitness(std::vector<Learner>              &le
     learners.erase(learners.begin() + p_keep, learners.end());
 
     return learners[0].fitness / tau;
+}
+
+float
+ClassificationEnvironment::crossEntropyFitness(std::vector<Learner>              &learners,
+                                               std::vector< std::vector<float> > &G)
+{
+    // Sum across rows of G to calculate per-class accuracy
+    float max_fitness = 0.0;
+    for( int i = 0; i < p_size; i++ ) {
+        float fitness = 0.0;
+        for( int k = 0; k < tau; k++ ) {
+            fitness += G[i][k];
+        }
+        if( fitness > max_fitness ) {
+            max_fitness = fitness;
+        }
+    }
+
+    // Sum across rows of G to calculate fitness
+    for( int i = 0; i < p_size; i++ ) {
+        learners[i].fitness = 0.0;
+        for( int k = 0; k < tau; k++ ) {
+            learners[i].fitness += -std::log(G[i][k]);
+        }
+    }
+
+    // Sort Learners by
+    std::sort(learners.begin(), learners.end(), [](Learner &a, Learner &b) {
+        return a.fitness < b.fitness;
+    });
+
+    // Remove the p_gap worst performing individuals
+    // (Technically, we save the (p_size - p_gap) individuals)
+    int p_keep = p_size - p_gap;
+    learners.erase(learners.begin() + p_keep, learners.end());
+
+    return max_fitness / tau;
 }
 
 float
@@ -186,14 +223,14 @@ ClassificationEnvironment::train(int num_generations) {
         // Initialize Learners
         std::vector<Learner> learners = initializeLearners(action);
 
+        std::vector<Point> points;
         for(int t = 0; t < num_generations; t++) {
 
             // Generate new individuals
             generateLearners(learners);
 
-
             // Generate new Points
-            std::vector<Point> points = generatePoints();
+            if( t == 0) points = generatePoints();
 
             // Calculate the outcome of each Learner on each Point
             for( int i = 0; i < p_size; i++ ) {
@@ -209,6 +246,18 @@ ClassificationEnvironment::train(int num_generations) {
 
 #ifdef SIMPLE_FITNESS
             float fitness = standardFitness(learners, G);
+
+            std::cout << "Class: " << action
+                      << " Gen: " << t
+                      << " Class accuracy: "
+                      << fitness
+                      << "                    "
+                      << '\r' << std::flush;
+
+#endif
+
+#ifdef CROSS_ENTROPY
+            float fitness = crossEntropyFitness(learners, G);
 
             std::cout << "Class: " << action
                       << " Gen: " << t

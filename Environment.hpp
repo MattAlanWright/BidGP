@@ -29,7 +29,7 @@ public:
     int p_gap;
     int tau;
 
-    BalancedDataset dataset;
+    UniformDataset dataset;
 
     // Solution population
     std::vector<Learner> S;
@@ -57,6 +57,10 @@ public:
 
     // Fitness measurements
     float standardFitness(
+        std::vector<Learner>              &learners,
+        std::vector< std::vector<float> > &G);
+
+    float crossEntropyFitness(
         std::vector<Learner>              &learners,
         std::vector< std::vector<float> > &G);
 

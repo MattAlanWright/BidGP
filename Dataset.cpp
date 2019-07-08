@@ -67,6 +67,18 @@ std::vector<Point> BalancedDataset::getRandomExemplars(int tau) {
         auto end   = dataset[i].begin() + num_points;
         std::vector<Point> class_subset(start, end);
 
+        /*
+        if( num_points < tau ) {
+            auto class_subset_copy = class_subset;
+            for( int i = 0; i < (tau / num_points) - 1; i++ ) {
+                class_subset.insert(class_subset.end(), class_subset_copy.begin(), class_subset_copy.end());
+            }
+            class_subset.insert(class_subset.end(),
+                                class_subset_copy.begin(),
+                                class_subset_copy.begin() + (tau % num_points));
+        }
+        */
+        
         // Insert class_subset into subset
         subset.insert(subset.end(), class_subset.begin(), class_subset.end());
     }

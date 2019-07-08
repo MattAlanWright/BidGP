@@ -32,11 +32,11 @@ void shuttleExperiment() {
         shuttle->num_features,
         100,
         70,
-        100,
+        200,
         shuttle->train_X,
         shuttle->train_y);
 
-    env.train(500);
+    env.train(2000);
 
     std::cout << "Training Accuracy: " << env.accuracy(shuttle->train_X, shuttle->train_y) << std::endl;
     std::cout << "Training Recall: " << env.detectionRate(shuttle->train_X, shuttle->train_y) << std::endl;
