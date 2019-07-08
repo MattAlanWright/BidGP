@@ -11,7 +11,7 @@ float sigmoid(float z) {
 }
 
 float clamp(float value, float min, float max) {
-    return std::max(std::min(value, max), min);
+    return std::fmax(std::fmin(value, max), min);
 }
 
 Learner::Learner(int action,
@@ -29,7 +29,6 @@ Learner::Learner(int action,
     if( action == -1 ) action = Random::get<int>(0, num_actions - 1);
 
     // Reserve space in vectors for maximum number of possible instructions
-    int num_initial_instructions = num_registers * num_registers;
     instructions.reserve(MAX_NUM_INSTRUCTIONS);
 
     // Initialize random instructions

@@ -49,7 +49,7 @@ public:
         std::vector< std::vector<float> > data;
         std::vector<int>                  labels;
 
-        io::CSVReader<5> in("iris.data");
+        io::CSVReader<5> in("iris-normalized.data");
 
 
         while( in.read_row(sepal_length,
@@ -76,9 +76,9 @@ public:
 
         // Shuffle data
         std::default_random_engine e;
-        e.seed(10);
+        e.seed(42);
         std::shuffle(std::begin(data), std::end(data), e);
-        e.seed(10);
+        e.seed(42);
         std::shuffle(std::begin(labels), std::end(labels), e);
 
         // Read values directly into raw float arrays

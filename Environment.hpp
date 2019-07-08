@@ -7,6 +7,11 @@
 
 #include <vector>
 
+struct Outcome {
+    float fitness;
+    bool  match;
+};
+
 class ClassificationEnvironment {
 
 public:
@@ -24,7 +29,7 @@ public:
     int p_gap;
     int tau;
 
-    UniformDataset dataset;
+    BalancedDataset dataset;
 
     // Solution population
     std::vector<Learner> S;
@@ -37,7 +42,10 @@ public:
     std::vector<Point> generatePoints();
 
     // Let the Hosts bid on the Points and store the results
-    void calculateOutcomeMatrix();
+    void calculateOutcomeMatrix(
+        std::vector<Learner>                &learners,
+        std::vector<Point>                  &points,
+        std::vector< std::vector<Outcome> > &G);
 
     // Evaluation methods
     void evaluateHosts();
@@ -47,6 +55,15 @@ public:
     void removeHosts();
     void removePoints();
 
+    // Fitness measurements
+    float standardFitness(
+        std::vector<Learner>              &learners,
+        std::vector< std::vector<float> > &G);
+
+    float fitnessSharing(
+        std::vector<Learner>              &learners,
+        std::vector< std::vector<float> > &G);
+
     // Core training alorithm
     void train(int num_generations);
 
@@ -54,8 +71,13 @@ public:
     int classify(const std::vector<float> &features);
 
     // Find accuracy using discovered solution
-    float accuracy(const std::vector<std::vector<float>> &X,
-                   const std::vector<int>                &y);
+    float accuracy(
+        const std::vector<std::vector<float>> &X,
+        const std::vector<int>                &y);
+
+    float detectionRate(
+        const std::vector<std::vector<float>> &X,
+        const std::vector<int>                &y);
 };
 
 #endif //_ENVIRONMENT_HPP

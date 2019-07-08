@@ -46,6 +46,7 @@ public:
     int                      action;
     std::vector<float>       registers;
     std::vector<Instruction> instructions;
+    std::vector<float>       outcome;
 
 
     //////////////////////////////////////////////////////////
