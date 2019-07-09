@@ -6,3 +6,6 @@ BGP
 
 # Mac artifacts
 .DS_Store
+
+# Records
+accuracy*.txt

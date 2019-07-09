@@ -1,6 +1,8 @@
 #include "Environment.hpp"
 
 #include <cmath>
+#include <iostream>
+#include <fstream>
 
 // Effolkronium random library
 #include "random.hpp"
@@ -68,7 +70,7 @@ ClassificationEnvironment::generateLearners(std::vector<Learner> &learner_pop) {
     std::vector<Learner> new_learners;
     for( int i = 0; i < l_gap; i++ ) {
 
-        if( Random::get<float>(0.0, 1.0) < 0.5 ) {
+        if( Random::get<float>(0.0, 1.0) < 0.75 ) {
 
             // Copy member of current Learner pop into new_learner
             Learner new_learner = *Random::get(learner_pop);
@@ -242,6 +244,11 @@ ClassificationEnvironment::train(int num_generations) {
 
     for( int action = 0; action < num_classes; action++ ) {
 
+        std::ofstream accuracy_file;
+        accuracy_file.open(std::string("accuracy") + std::to_string(action) + std::string(".txt"));
+
+        accuracy_file << action << '\n';
+
         // Initialize Learners
         std::vector<Learner> learners = initializeLearners(action);
 
@@ -268,39 +275,26 @@ ClassificationEnvironment::train(int num_generations) {
 
 #ifdef SIMPLE_FITNESS
             float fitness = standardFitness(learners, G);
-
-            std::cout << "Class: " << action
-                      << " Gen: " << t
-                      << " Class accuracy: "
-                      << fitness
-                      << "                    "
-                      << '\r' << std::flush;
-
 #endif
-
 
 #ifdef FITNESS_SHARING
             float fitness = fitnessSharing(learners, G);
-
-            std::cout << "Class: " << action
-                      << " Gen: " << t
-                      << " Class accuracy: "
-                      << fitness
-                      << "                    "
-                      << '\r' << std::flush;
 #endif
 
 #ifdef PARETO
             float fitness = paretoFitness(learners, G);
-
+#endif
             std::cout << "Class: " << action
                       << " Gen: " << t
                       << " Class accuracy: "
                       << fitness
                       << "                    "
                       << '\r' << std::flush;
-#endif
+
+            accuracy_file << fitness << ',';
         }
+
+        accuracy_file.close();
 
         std::cout << std::endl;
         S.insert(S.end(), learners.begin(), learners.end());

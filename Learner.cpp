@@ -21,6 +21,7 @@ Learner::Learner(int action,
     : action(action),
       num_registers(num_registers),
       num_actions(num_actions),
+      num_inputs(num_inputs),
       registers(num_registers),
       source_mod_value {num_registers, num_inputs},
       fitness(0.0)
@@ -38,7 +39,7 @@ Learner::Learner(int action,
 
 void Learner::initializeInstructions() {
     int num_initial_instructions = num_registers * num_registers;
-    Instruction instruction;
+    Instruction instruction(num_inputs);
     for(int i = 0; i < num_initial_instructions; i++) {
         instruction.randomize();
         instructions.push_back(instruction);
@@ -56,7 +57,7 @@ void Learner::mutate() {
 
 
 void Learner::deleteRandomInstruction(float prob_delete) {
-    if( Random::get<float>(0.0, 1.0) > prob_delete && instructions.size() > MIN_NUM_INSTRUCTIONS ) {
+    if( Random::get<float>(0.0, 1.0) > prob_delete || instructions.size() <= MIN_NUM_INSTRUCTIONS ) {
         return;
     }
 
@@ -66,11 +67,11 @@ void Learner::deleteRandomInstruction(float prob_delete) {
 
 
 void Learner::addRandomInstruction(float prob_add) {
-    if( Random::get<float>(0.0, 1.0) > prob_add && instructions.size() < MAX_NUM_INSTRUCTIONS ) {
+    if( Random::get<float>(0.0, 1.0) > prob_add || instructions.size() >= MAX_NUM_INSTRUCTIONS ) {
         return;
     }
 
-    Instruction new_instruction;
+    Instruction new_instruction(num_inputs);
     new_instruction.randomize();
 
     int random_instruction_index = Random::get<int>(0, instructions.size() - 1);
@@ -85,7 +86,7 @@ void Learner::mutateRandomInstruction(float prob_mutate) {
 
 
     int random_instruction_index = Random::get<int>(0, instructions.size() - 1);
-    instructions[random_instruction_index].toggleRandomBit();
+    instructions[random_instruction_index].mutate();
 }
 
 

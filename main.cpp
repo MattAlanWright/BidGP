@@ -16,7 +16,7 @@ void irisExperiment() {
         iris->train_X,
         iris->train_y);
 
-    env.train(1000);
+    env.train(500);
 
     std::cout << "Training Accuracy: " << env.accuracy(iris->train_X, iris->train_y) << std::endl;
     std::cout << "Training Recall: " << env.detectionRate(iris->train_X, iris->train_y) << std::endl;
@@ -36,7 +36,7 @@ void shuttleExperiment() {
         shuttle->train_X,
         shuttle->train_y);
 
-    env.train(7000);
+    env.train(10000);
 
     std::cout << "Training Accuracy: " << env.accuracy(shuttle->train_X, shuttle->train_y) << std::endl;
     std::cout << "Training Recall: " << env.detectionRate(shuttle->train_X, shuttle->train_y) << std::endl;

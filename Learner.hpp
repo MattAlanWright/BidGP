@@ -38,6 +38,7 @@ public:
 
     int num_registers;
     int num_actions;
+    int num_inputs;
 
     int source_mod_value[2];
 

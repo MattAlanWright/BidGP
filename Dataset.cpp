@@ -35,7 +35,7 @@ std::vector<Point> UniformDataset::getRandomExemplars(int tau) {
 }
 
 int UniformDataset::getSubsetSize(int tau) {
-    return tau;
+    return (dataset.size() >= tau) ? tau : dataset.size();;
 }
 
 BalancedDataset::BalancedDataset(const std::vector< std::vector<float> > &X,
@@ -61,43 +61,6 @@ std::vector<Point> BalancedDataset::getRandomExemplars(int tau) {
 
     std::vector<Point> subset;
 
-    /*
-    std::vector<int> num_points_per_class(num_classes, 0);
-    for( int i = 0; i < num_classes; i++ ) {
-        num_points_per_class[i] = tau / num_classes;
-    }
-
-    int remainder = tau % num_classes;
-    for( int i = 0; i < remainder; i++ ) {
-        num_points_per_class[i] += 1;
-    }
-
-    for(int i = 0; i < num_classes; i++) {
-        int num_points = (dataset[i].size() >= num_points_per_class[i]) ? num_points_per_class[i] : dataset[i].size();
-
-        // Shuffle dataset uniformly and take the first class_subset_size Points
-        Random::shuffle(dataset[i]);
-
-        for( int j = 0; j < (num_points_per_class[i] / num_points); j++ ) {
-            auto start = dataset[i].begin();
-            auto end   = dataset[i].begin() + num_points;
-            std::vector<Point> class_subset(start, end);
-
-            // Insert class_subset into subset
-            subset.insert(subset.end(), class_subset.begin(), class_subset.end());
-        }
-
-        num_points = num_points_per_class[i] % num_points;
-
-        auto start = dataset[i].begin();
-        auto end   = dataset[i].begin() + num_points;
-        std::vector<Point> class_subset(start, end);
-
-        // Insert class_subset into subset
-        subset.insert(subset.end(), class_subset.begin(), class_subset.end());
-    }
-    */
-
     for(int i = 0; i < num_classes; i++) {
         int num_points = (dataset[i].size() >= tau) ? tau : dataset[i].size();
 
@@ -110,6 +73,19 @@ std::vector<Point> BalancedDataset::getRandomExemplars(int tau) {
 
         // Insert class_subset into subset
         subset.insert(subset.end(), class_subset.begin(), class_subset.end());
+
+        if( num_points < tau ) {
+            int num_sub_subsets = tau / num_points - 1;
+
+            for( int j = 0; j < num_sub_subsets; j++ ) {
+                auto start = dataset[i].begin();
+                auto end   = dataset[i].begin() + num_points;
+                std::vector<Point> another_class_subset(start, end);
+
+                // Insert class_subset into subset
+                subset.insert(subset.end(), another_class_subset.begin(), another_class_subset.end());
+            }
+        }
     }
 
     return subset;
@@ -120,8 +96,15 @@ int BalancedDataset::getSubsetSize(int tau) {
 
     for(int i = 0; i < num_classes; i++) {
         int num_points = (dataset[i].size() >= tau) ? tau : dataset[i].size();
-
         subset_size += num_points;
+
+        if( num_points < tau ) {
+            int num_sub_subsets = tau / num_points - 1;
+
+            for( int j = 0; j < num_sub_subsets; j++ ) {
+                subset_size += num_points;
+            }
+        }
     }
 
     return subset_size;

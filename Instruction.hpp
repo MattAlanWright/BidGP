@@ -23,6 +23,13 @@ enum InstructionOperation {
     INST_NUM_OPERATIONS
 };
 
+enum InstructionComponent {
+    INST_SOURCE,
+    INST_OP,
+    INST_TARGET,
+    INST_MODE,
+    INST_NUM_COMPONENTS
+};
 
 /*
 Instruction:
@@ -42,56 +49,47 @@ to retrieve valid bits.
 */
 struct Instruction {
 
-    int packed_instruction;
+    int instruction[INST_NUM_COMPONENTS];
+    int max_component_values[INST_NUM_COMPONENTS];
 
-    static const std::initializer_list<int> valid_bits;
-
-    static const unsigned int mode_shift   = 24;
-    static const unsigned int target_shift = 16;
-    static const unsigned int op_shift     = 8;
-
-    static const unsigned int mode_mask    = 0b00000001;
-    static const unsigned int target_mask  = 0b00000111;
-    static const unsigned int op_mask      = 0b00000111;
-    static const unsigned int source_mask  = 0b00001111;
-
-    static const unsigned int valid_bits_mask = (mode_mask << mode_shift)     |
-                                                (target_mask << target_shift) |
-                                                (op_mask << op_shift)         |
-                                                source_mask;
-
-    inline Instruction() { packed_instruction = 0; }
-
-    inline int getMode() const {
-        return (packed_instruction >> mode_shift) & mode_mask;
-    }
-
-    inline int getTarget() const {
-        return (packed_instruction >> target_shift) & target_mask;
-    }
-
-    inline int getOp() const {
-        return (packed_instruction >> op_shift) & op_mask;
-    }
-
-    inline int getSource() const {
-        if((packed_instruction & source_mask) > 8) {
-            return 8;
-        } else {
-            return packed_instruction & source_mask;
-        }
-    }
-
-    inline void toggleRandomBit() {
-        // Pick random bit from list of togglable bits
-        int bit = Random::get<int>(valid_bits);
-
-        // Toggle bit
-        packed_instruction ^= (1UL << bit);
+    Instruction(int num_features) : instruction { 0 }
+    {
+        max_component_values[INST_MODE]   = 1;
+        max_component_values[INST_TARGET] = 7;
+        max_component_values[INST_OP]     = 7;
+        max_component_values[INST_SOURCE] = num_features - 1;
     }
 
     inline void randomize() {
-        packed_instruction = Random::get<int>() & valid_bits_mask;
+      instruction[INST_MODE]   = Random::get<int>(0, max_component_values[INST_MODE] );
+      instruction[INST_TARGET] = Random::get<int>(0, max_component_values[INST_TARGET] );
+      instruction[INST_OP]     = Random::get<int>(0, max_component_values[INST_OP] );
+      instruction[INST_SOURCE] = Random::get<int>(0, max_component_values[INST_SOURCE] );
+    }
+
+    inline int getMode() const {
+        return instruction[INST_MODE];
+    }
+
+    inline int getTarget() const {
+        return instruction[INST_TARGET];
+    }
+
+    inline int getOp() const {
+        return instruction[INST_OP];
+    }
+
+    inline int getSource() const {
+        return instruction[INST_SOURCE];
+    }
+
+    inline void mutate() {
+        // Randomly select which component to mutate
+        int component = Random::get<int>(0, INST_NUM_COMPONENTS - 1);
+
+        // Randomly select a new value for that component
+        int new_component_val = Random::get<int>(0, max_component_values[component]);
+        instruction[component] = new_component_val;
     }
 };
 
