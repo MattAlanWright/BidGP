@@ -5,6 +5,11 @@
 
 #include "Point.hpp"
 
+enum DatasetType {
+    UNIFORM,
+    BALANCED
+};
+
 class UniformDataset {
 
 public:
@@ -17,6 +22,7 @@ public:
     //
     std::vector<Point> dataset;
     std::vector<Point> getRandomExemplars(int tau);
+    int getSubsetSize(int tau);
 };
 
 
@@ -35,6 +41,7 @@ public:
     //
     std::vector< std::vector<Point> > dataset;
     std::vector<Point> getRandomExemplars(int tau);
+    int getSubsetSize(int tau);
 };
 
 #endif //_DATA_HPP

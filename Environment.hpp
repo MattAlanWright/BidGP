@@ -17,19 +17,20 @@ class ClassificationEnvironment {
 public:
     ClassificationEnvironment(int num_classes,
                               int num_features,
-                              int p_size,
-                              int p_gap,
+                              int l_size,
+                              int l_gap,
                               int tau,
                               const std::vector<std::vector<float>> &X,
                               const std::vector<int>                &y);
 
     int num_classes;
     int num_features;
-    int p_size;
-    int p_gap;
+    int l_size;
+    int l_gap;
     int tau;
+    int p_size;
 
-    UniformDataset dataset;
+    BalancedDataset dataset;
 
     // Solution population
     std::vector<Learner> S;
@@ -60,7 +61,7 @@ public:
         std::vector<Learner>              &learners,
         std::vector< std::vector<float> > &G);
 
-    float crossEntropyFitness(
+    float paretoFitness(
         std::vector<Learner>              &learners,
         std::vector< std::vector<float> > &G);
 

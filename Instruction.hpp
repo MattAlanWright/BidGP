@@ -53,7 +53,7 @@ struct Instruction {
     static const unsigned int mode_mask    = 0b00000001;
     static const unsigned int target_mask  = 0b00000111;
     static const unsigned int op_mask      = 0b00000111;
-    static const unsigned int source_mask  = 0b00000011;
+    static const unsigned int source_mask  = 0b00001111;
 
     static const unsigned int valid_bits_mask = (mode_mask << mode_shift)     |
                                                 (target_mask << target_shift) |
@@ -75,7 +75,11 @@ struct Instruction {
     }
 
     inline int getSource() const {
-        return packed_instruction & source_mask;
+        if((packed_instruction & source_mask) > 8) {
+            return 8;
+        } else {
+            return packed_instruction & source_mask;
+        }
     }
 
     inline void toggleRandomBit() {

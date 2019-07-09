@@ -23,15 +23,19 @@ UniformDataset::UniformDataset(const std::vector< std::vector<float> > &X,
 }
 
 std::vector<Point> UniformDataset::getRandomExemplars(int tau) {
+    int num_points = (dataset.size() >= tau) ? tau : dataset.size();
 
     // Shuffle dataset uniformly and take the first tau Points
     Random::shuffle(dataset);
 
     auto start = dataset.begin();
-    auto end   = dataset.begin() + tau;
+    auto end   = dataset.begin() + num_points;
     std::vector<Point> subset(start, end);
-
     return subset;
+}
+
+int UniformDataset::getSubsetSize(int tau) {
+    return tau;
 }
 
 BalancedDataset::BalancedDataset(const std::vector< std::vector<float> > &X,
@@ -57,32 +61,68 @@ std::vector<Point> BalancedDataset::getRandomExemplars(int tau) {
 
     std::vector<Point> subset;
 
+    /*
+    std::vector<int> num_points_per_class(num_classes, 0);
+    for( int i = 0; i < num_classes; i++ ) {
+        num_points_per_class[i] = tau / num_classes;
+    }
+
+    int remainder = tau % num_classes;
+    for( int i = 0; i < remainder; i++ ) {
+        num_points_per_class[i] += 1;
+    }
+
     for(int i = 0; i < num_classes; i++) {
-        // Shuffle dataset uniformly and take the first tau Points
+        int num_points = (dataset[i].size() >= num_points_per_class[i]) ? num_points_per_class[i] : dataset[i].size();
+
+        // Shuffle dataset uniformly and take the first class_subset_size Points
         Random::shuffle(dataset[i]);
 
-        int num_points = (dataset[i].size() >= tau) ? tau : dataset[i].size();
+        for( int j = 0; j < (num_points_per_class[i] / num_points); j++ ) {
+            auto start = dataset[i].begin();
+            auto end   = dataset[i].begin() + num_points;
+            std::vector<Point> class_subset(start, end);
+
+            // Insert class_subset into subset
+            subset.insert(subset.end(), class_subset.begin(), class_subset.end());
+        }
+
+        num_points = num_points_per_class[i] % num_points;
 
         auto start = dataset[i].begin();
         auto end   = dataset[i].begin() + num_points;
         std::vector<Point> class_subset(start, end);
 
-        /*
-        if( num_points < tau ) {
-            auto class_subset_copy = class_subset;
-            for( int i = 0; i < (tau / num_points) - 1; i++ ) {
-                class_subset.insert(class_subset.end(), class_subset_copy.begin(), class_subset_copy.end());
-            }
-            class_subset.insert(class_subset.end(),
-                                class_subset_copy.begin(),
-                                class_subset_copy.begin() + (tau % num_points));
-        }
-        */
-        
+        // Insert class_subset into subset
+        subset.insert(subset.end(), class_subset.begin(), class_subset.end());
+    }
+    */
+
+    for(int i = 0; i < num_classes; i++) {
+        int num_points = (dataset[i].size() >= tau) ? tau : dataset[i].size();
+
+        // Shuffle dataset uniformly and take the first class_subset_size Points
+        Random::shuffle(dataset[i]);
+
+        auto start = dataset[i].begin();
+        auto end   = dataset[i].begin() + num_points;
+        std::vector<Point> class_subset(start, end);
+
         // Insert class_subset into subset
         subset.insert(subset.end(), class_subset.begin(), class_subset.end());
     }
 
-    Random::shuffle(subset);
     return subset;
+}
+
+int BalancedDataset::getSubsetSize(int tau) {
+    int subset_size = 0;
+
+    for(int i = 0; i < num_classes; i++) {
+        int num_points = (dataset[i].size() >= tau) ? tau : dataset[i].size();
+
+        subset_size += num_points;
+    }
+
+    return subset_size;
 }

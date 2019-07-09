@@ -3,3 +3,6 @@ BGP
 
 # Object files
 *.o
+
+# Mac artifacts
+.DS_Store
