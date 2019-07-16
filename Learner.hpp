@@ -19,10 +19,10 @@ using Random = effolkronium::random_static;
 #define MAX_NUM_INSTRUCTIONS        96
 
 // Stoachastic mutation probabilities
-#define PROB_DEL_INST     0.1
-#define PROB_ADD_INST     0.1
-#define PROB_MUT_INST     0.1
-#define PROB_SWP_INST     0.1
+#define PROB_DEL_INST     0.2
+#define PROB_ADD_INST     0.2
+#define PROB_MUT_INST     0.2
+#define PROB_SWP_INST     0.2
 
 class Learner {
 

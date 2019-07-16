@@ -84,7 +84,6 @@ void Learner::mutateRandomInstruction(float prob_mutate) {
         return;
     }
 
-
     int random_instruction_index = Random::get<int>(0, instructions.size() - 1);
     instructions[random_instruction_index].mutate();
 }
@@ -172,5 +171,4 @@ void Learner::executeInstruction(const Instruction& instruction,
 
     // Safeguard against overflows, NaNs, Infs, etc.
     registers[target_index] = clamp(val, MIN_REGISTER_VAL, MAX_REGISTER_VAL);
-
 }

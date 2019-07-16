@@ -21,7 +21,9 @@ public:
                               int l_gap,
                               int tau,
                               const std::vector<std::vector<float>> &X,
-                              const std::vector<int>                &y);
+                              const std::vector<int>                &y,
+                              std::string filename,
+                              bool do_fitness_sharing);
 
     int num_classes;
     int num_features;
@@ -29,6 +31,8 @@ public:
     int l_gap;
     int tau;
     int p_size;
+    bool do_fitness_sharing;
+    std::string filename;
 
     BalancedDataset dataset;
 

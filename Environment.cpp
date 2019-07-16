@@ -37,13 +37,17 @@ ClassificationEnvironment::ClassificationEnvironment(
     int l_gap,
     int tau,
     const std::vector<std::vector<float>> &X,
-    const std::vector<int>                &y) :
+    const std::vector<int>                &y,
+    std::string filename,
+    bool do_fitness_sharing) :
 
     num_classes(num_classes),
     num_features(num_features),
     l_size(l_size),
     l_gap(l_gap),
     tau(tau),
+    filename(filename),
+    do_fitness_sharing(do_fitness_sharing),
     dataset(X, y, num_classes)
 {
     //p_size = (tau <= X.size()) ? tau : X.size();
@@ -245,7 +249,7 @@ ClassificationEnvironment::train(int num_generations) {
     for( int action = 0; action < num_classes; action++ ) {
 
         std::ofstream accuracy_file;
-        accuracy_file.open(std::string("accuracy") + std::to_string(action) + std::string(".txt"));
+        accuracy_file.open(filename + std::to_string(action) + std::string(".txt"));
 
         accuracy_file << action << '\n';
 
@@ -273,17 +277,13 @@ ClassificationEnvironment::train(int num_generations) {
                 }
             }
 
-#ifdef SIMPLE_FITNESS
-            float fitness = standardFitness(learners, G);
-#endif
+            float fitness;
+            if( do_fitness_sharing ) {
+                fitness = fitnessSharing(learners, G);
+            } else {
+                fitness = standardFitness(learners, G);
+            }
 
-#ifdef FITNESS_SHARING
-            float fitness = fitnessSharing(learners, G);
-#endif
-
-#ifdef PARETO
-            float fitness = paretoFitness(learners, G);
-#endif
             std::cout << "Class: " << action
                       << " Gen: " << t
                       << " Class accuracy: "

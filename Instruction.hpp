@@ -31,22 +31,6 @@ enum InstructionComponent {
     INST_NUM_COMPONENTS
 };
 
-/*
-Instruction:
-This struct is a bunch of inlined functionality surrounding a single 32-bit
-integer. Each byte of this integer holds a single component of the instruction.
-Bit-wise masks are used to ensure each byte's value is within the valid range
-for that instruction.
-
-TODO: This is not very generalizable. Changing the valid ranges/values of these
-components requires manually re-calculating and changing masks, and manually
-changing them back if we need to re-use the original values. Make the move to
-templated struct. It will look gross but be very easy to change and experiment with.
-
-In general, the operation for getting a specific component out of the packed 32-bit
-integer is: shift the component byte to the LSB position and perform a bitwise AND
-to retrieve valid bits.
-*/
 struct Instruction {
 
     int instruction[INST_NUM_COMPONENTS];
